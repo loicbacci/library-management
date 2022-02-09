@@ -1,25 +1,40 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState } from 'react';
 import './App.css';
+import Entry from './entry/Entry';
+import BookList from './books/BookList';
+import { Routes, Route } from 'react-router-dom';
+import Home from './home/Home';
+import Header from './common/Header';
+import ClientsList from './clients/ClientsList';
+import { auth } from './firebase/utils';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+const App = () => {
+  const [loggedIn, setLoggedIn] = useState(auth.currentUser !== null);
+
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      // Already logged in
+      setLoggedIn(true);
+    } else {
+      setLoggedIn(false);
+    }
+  })
+
+  if (!loggedIn) {
+    return <Entry logIn={() => setLoggedIn(true)}/>;
+  }
+
+  return(
+    <>
+      <Header />
+
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/books" element={<BookList />}/>
+        <Route path="/clients" element={<ClientsList />}/>
+      </Routes>
+    </>
+
   );
 }
 
