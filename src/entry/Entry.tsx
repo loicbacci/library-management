@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { UserCredential } from 'firebase/auth';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase/utils';
 import Form from 'react-bootstrap/Form';
