@@ -1,10 +1,18 @@
 import React, { useState } from 'react';
-import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
 import { removeBook } from '../firebase/books';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import {
+  Button,
+  ButtonGroup,
+  FormControl,
+  FormLabel, Heading, IconButton,
+  Input, Modal,
+  ModalBody,
+  ModalContent, ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Stack, Text
+} from '@chakra-ui/react';
+import { FiTrash } from 'react-icons/fi';
 
 interface ViewBookModalProps {
   shown: boolean,
@@ -37,28 +45,62 @@ const ViewBookModal = (props: ViewBookModalProps) => {
   }
 
   return (
-    <Modal show={shown} centered>
-      <Modal.Header>
-        <Modal.Title>{book.title}</Modal.Title>
-        {book.author}
-      </Modal.Header>
+    <Modal isOpen={shown} onClose={onClose} closeOnOverlayClick={false}>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>
+          <Heading>{title}</Heading>
+          <Text>{author}</Text>
+        </ModalHeader>
 
-      <Modal.Body>
+        <ModalBody>
+          <Stack spacing={4}>
 
-        <Form>
-          <Form.Group className="mb-3" controlId="formTitle">
-            <Form.Label>Title</Form.Label>
-            <Form.Control type="text" value={book.title}
-                          onChange={e => setTitle(e.target.value)}
+            <FormControl>
+              <FormLabel htmlFor="title">Title</FormLabel>
+              <Input
+                id="title"
+                pr="4.5rem"
+                type="text"
+                placeholder="Enter title"
+                value={title}
+                onChange={e => setTitle(e.target.value)}
+              />
+            </FormControl>
+
+            <FormControl>
+              <FormLabel htmlFor="author">Author</FormLabel>
+              <Input
+                id="author"
+                pr="4.5rem"
+                type="text"
+                placeholder="Enter author"
+                value={author}
+                onChange={e => setAuthor(e.target.value)}
+              />
+            </FormControl>
+
+          </Stack>
+        </ModalBody>
+
+        <ModalFooter>
+          <ButtonGroup>
+            <IconButton
+              colorScheme="red"
+              aria-label="Delete book"
+              icon={<FiTrash />}
+              onClick={handleDelete}
             />
-          </Form.Group>
+            <Button onClick={onClose}>Cancel</Button>
+            <Button colorScheme="teal" onClick={handleSubmit}>Edit</Button>
+          </ButtonGroup>
 
-          <Form.Group className="mb-3" controlId="formAuthor">
-            <Form.Label>Author</Form.Label>
-            <Form.Control type="text" value={book.author}
-                          onChange={e => setAuthor(e.target.value)}
-            />
-          </Form.Group>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+  )
+
+  /*
 
           <Form.Check
             type="checkbox"
@@ -75,22 +117,8 @@ const ViewBookModal = (props: ViewBookModalProps) => {
               />
             </Form.Group>
           )}
-        </Form>
-      </Modal.Body>
 
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onClose}>
-          Close
-        </Button>
-        <Button variant="primary" onClick={handleSubmit}>
-          Edit
-        </Button>
-        <Button variant="danger" onClick={handleDelete}>
-          <FontAwesomeIcon icon={faTrash} />
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  );
+   */
 }
 
 export default ViewBookModal;

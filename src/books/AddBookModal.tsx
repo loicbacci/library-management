@@ -1,59 +1,116 @@
 import React, { useState } from 'react';
-import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
+import {
+  Button,
+  ButtonGroup,
+  FormControl,
+  FormLabel,
+  IconButton,
+  Input,
+  InputGroup,
+  InputRightElement,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Stack
+} from '@chakra-ui/react';
+import { FiChevronDown } from 'react-icons/fi';
 
 interface AddBookModalProps {
   shown: boolean,
   onClose: () => void,
-  addBook: (title: string, author: string) => void
+  addBook: (title: string, author: string) => void,
+
+  authors: string[]
 }
 
 const AddBookModal = (props: AddBookModalProps) => {
-  const { shown, onClose, addBook } = props;
+  const { shown, onClose, addBook, authors } = props;
 
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
 
   const handleSubmit = () => {
     addBook(title, author);
+    setTitle("");
+    setAuthor("");
   }
 
   return (
-    <Modal show={shown} centered>
-      <Modal.Header>
-        <Modal.Title>Add a book</Modal.Title>
-      </Modal.Header>
+    <Modal isOpen={shown} onClose={onClose} closeOnOverlayClick={false}>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>Add a book</ModalHeader>
 
-      <Modal.Body>
-        <Form>
-          <Form.Group className="mb-3" controlId="formTitle">
-            <Form.Label>Title</Form.Label>
-            <Form.Control type="text" placeholder="Enter title"
-                   onChange={e => setTitle(e.target.value)}
-            />
-          </Form.Group>
+        <ModalBody>
+          <Stack spacing={4}>
 
-          <Form.Group className="mb-3" controlId="formAuthor">
-            <Form.Label>Author</Form.Label>
-            <Form.Control type="text" placeholder="Enter author"
-                   onChange={e => setAuthor(e.target.value)}
-            />
-          </Form.Group>
-        </Form>
+            <FormControl>
+              <FormLabel htmlFor="title">Title</FormLabel>
+              <Input
+                id="title"
+                pr="4.5rem"
+                type="text"
+                placeholder="Enter title"
+                value={title}
+                onChange={e => setTitle(e.target.value)}
+              />
+            </FormControl>
 
-      </Modal.Body>
+            <FormControl>
+              <FormLabel htmlFor="author">Author</FormLabel>
 
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onClose}>
-          Cancel
-        </Button>
-        <Button variant="primary" onClick={handleSubmit}>
-          Submit
-        </Button>
-      </Modal.Footer>
+              <InputGroup>
+                <Input
+                  id="author"
+                  pr="4.5rem"
+                  type="text"
+                  placeholder="Enter author"
+                  value={author}
+                  onChange={e => setAuthor(e.target.value)}
+                />
+
+                <InputRightElement>
+                  <Menu>
+                    <MenuButton
+                      h="1.75rem"
+                      as={IconButton}
+                      aria-label='Options'
+                      icon={<FiChevronDown />}
+                      variant='ghost'
+                    />
+                    <MenuList>
+                      {authors.map((au, i) => (
+                        <MenuItem key={i} onClick={() => setAuthor(au)}>
+                          {au}
+                        </MenuItem>
+                      ))}
+                    </MenuList>
+                  </Menu>
+                </InputRightElement>
+              </InputGroup>
+            </FormControl>
+
+          </Stack>
+        </ModalBody>
+
+        <ModalFooter>
+          <ButtonGroup>
+
+            <Button onClick={onClose}>Cancel</Button>
+            <Button colorScheme="teal" onClick={handleSubmit}>Save</Button>
+          </ButtonGroup>
+
+        </ModalFooter>
+      </ModalContent>
     </Modal>
-  );
+  )
 }
 
 export default AddBookModal;

@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import './App.css';
 import Entry from './entry/Entry';
-import BookList from './books/BookList';
+import Books from './books/Books';
 import { Routes, Route } from 'react-router-dom';
 import Home from './home/Home';
-import Header from './common/Header';
 import ClientsList from './clients/ClientsList';
 import { auth } from './firebase/utils';
+import Header from './header/Header';
 
 const App = () => {
   const [loggedIn, setLoggedIn] = useState(auth.currentUser !== null);
@@ -20,19 +20,20 @@ const App = () => {
     }
   })
 
-  if (!loggedIn) {
-    return <Entry logIn={() => setLoggedIn(true)}/>;
-  }
-
   return(
     <>
-      <Header />
+      <Header showLinks={loggedIn}/>
 
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/books" element={<BookList />}/>
-        <Route path="/clients" element={<ClientsList />}/>
-      </Routes>
+      {!loggedIn
+        ? <Entry logIn={() => setLoggedIn(true)}/>
+        : (
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/books" element={<Books />}/>
+            <Route path="/clients" element={<ClientsList />}/>
+          </Routes>
+        )
+      }
     </>
 
   );

@@ -1,22 +1,20 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Container from 'react-bootstrap/Container';
-import { Col, Row } from 'react-bootstrap';
+import { Button, Center, Container, Flex, Spacer, Stack } from '@chakra-ui/react';
 
 const Home = () => {
   return (
-    <Container className="p-3">
-      <Row className="pt-3 align-items-center h-100">
-        <Col className="d-flex justify-content-center">
-          <Link to="/books" className="btn btn-primary">Books</Link>
-        </Col>
+    <Center pt={6}>
+      <Stack spacing={6}>
+        <Button>
+          <Link to="/books">Books</Link>
+        </Button>
 
-        <Col className="d-flex justify-content-center">
-          <Link to="/clients" className="btn btn-primary">Clients</Link>
-        </Col>
-      </Row>
-
-    </Container>
+        <Button>
+          <Link to="/clients">Clients</Link>
+        </Button>
+      </Stack>
+    </Center>
   );
 }
 
