@@ -21,12 +21,11 @@ interface ViewBookModalProps {
 
   editBook: (newBook: Book) => void,
 
-  deleteSuccess: () => void,
-  deleteFailed: (reason: any) => void,
+  handleDelete: () => void
 }
 
 const ViewBookModal = (props: ViewBookModalProps) => {
-  const { shown, onClose, book, editBook, deleteSuccess, deleteFailed } = props;
+  const { shown, onClose, book, editBook, handleDelete } = props;
 
   const [title, setTitle] = useState(book.title);
   const [author, setAuthor] = useState(book.author);
@@ -36,12 +35,6 @@ const ViewBookModal = (props: ViewBookModalProps) => {
       ...book,
       title, author
     })
-  }
-
-  const handleDelete = () => {
-    removeBook(book.id)
-      .then(deleteSuccess)
-      .catch(deleteFailed)
   }
 
   return (
@@ -98,27 +91,7 @@ const ViewBookModal = (props: ViewBookModalProps) => {
         </ModalFooter>
       </ModalContent>
     </Modal>
-  )
-
-  /*
-
-          <Form.Check
-            type="checkbox"
-            label="Loaned?"
-            checked={book.loaned}
-            disabled
-          />
-
-          {book.loaned && (
-            <Form.Group className="mb-3" controlId="formLoanId">
-              <Form.Label>Loan ID</Form.Label>
-              <Form.Control type="text" value={book.loanId}
-                            disabled
-              />
-            </Form.Group>
-          )}
-
-   */
+  );
 }
 
 export default ViewBookModal;

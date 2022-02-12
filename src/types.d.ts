@@ -18,7 +18,8 @@ interface Client {
 }
 
 interface Field {
-  displayName: string,
-  fieldName: string,
-  placeholder?: string
+  name: string,
+  placeholder: string,
+
+  isNumber?: boolean
 }

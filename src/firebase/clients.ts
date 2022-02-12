@@ -37,6 +37,10 @@ export const removeClient = (id: string) => {
   return deleteDoc(doc(clientsRef, id));
 }
 
-export const addClient = (client: Client) => {
+export const addClient = (name: string, email: string, phone: string, address: string) => {
+  const client = {
+    name, email, phone, address,
+    id: ""
+  }
   return addDoc(clientsRef, client)
 }

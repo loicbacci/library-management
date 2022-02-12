@@ -43,5 +43,10 @@ export const removeBook = (id: string) => {
 }
 
 export const addBook = (title: string, author: string) => {
-  return addDoc(booksRef, { title, author, loaned: false ,id: "" })
+  const book: Book = {
+    title, author,
+    loaned: false,
+    id: ""
+  }
+  return addDoc(booksRef, book)
 }

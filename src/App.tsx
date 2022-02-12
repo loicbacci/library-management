@@ -4,7 +4,7 @@ import Entry from './entry/Entry';
 import Books from './books/Books';
 import { Routes, Route } from 'react-router-dom';
 import Home from './home/Home';
-import ClientsList from './clients/ClientsList';
+import Clients from './clients/Clients';
 import { auth } from './firebase/utils';
 import Header from './header/Header';
 
@@ -30,7 +30,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/books" element={<Books />}/>
-            <Route path="/clients" element={<ClientsList />}/>
+            <Route path="/clients" element={<Clients />}/>
           </Routes>
         )
       }

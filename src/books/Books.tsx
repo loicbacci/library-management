@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { addBook, getBookList } from '../firebase/books';
+import { addBook, getBookList, removeBook } from '../firebase/books';
 import AddBookModal from './AddBookModal';
 import BookListEntry from './BookListEntry';
 import ViewBookModal from './ViewBookModal';
 import { FilterStatus, SortStatus } from './bookTypes';
-import { Box, Container, Heading, Stack, useToast } from '@chakra-ui/react';
-import AddBookButton from './AddBookButton';
+import { Box, Heading, Stack, Text, useToast } from '@chakra-ui/react';
 import BooksOptions from './BooksOptions';
+import PageLayout from '../common/PageLayout';
+import AddButton from '../common/AddButton';
 
 
 const Books = () => {
@@ -46,15 +47,23 @@ const Books = () => {
           status: "success",
           isClosable: true
         })
+      })
+      .catch((reason) => {
+        toast({
+          title: "Failed to add book",
+          description: reason,
+          status: "error",
+          isClosable: true
+        })
       });
   }
 
-  const modalCloseHandler = () => {
+  const viewModalClose = () => {
     setShowViewModal(false);
     setSelectedBook(null);
   }
 
-  // Change options
+  // Filter books
   useEffect(() => {
     let newBookList: Book[] = [];
 
@@ -73,6 +82,7 @@ const Books = () => {
     setFilteredBookList(newBookList);
   }, [filterStatus, sortedList]);
 
+  // Sort books
   useEffect(() => {
     const newBookList = Array.from(bookList);
 
@@ -94,78 +104,76 @@ const Books = () => {
 
 
   // Handlers
-  const handleBookClick = (book: Book) => () => {
+  const bookClick = (book: Book) => () => {
     setSelectedBook(book);
     setShowViewModal(true);
   }
 
-  const handleDeleteSuccess = () => {
-    toast({
-      title: "Delete successful",
-      status: "success",
-      isClosable: true
-    })
+  const handleDelete = () => {
+    if (!selectedBook) return;
 
-    modalCloseHandler();
-  }
+    removeBook(selectedBook.id)
+      .then(() => {
+        toast({
+          title: "Delete successful",
+          status: "success",
+          isClosable: true
+        })
+      })
+      .catch((reason) => {
+        toast({
+          title: "Delete failed",
+          description: reason,
+          status: "error",
+          isClosable: true
+        })
+      })
 
-  const handleDeleteFailed = (reason: any) => {
-    toast({
-      title: "Delete failed",
-      description: reason,
-      status: "error",
-      isClosable: true
-    })
-
-    modalCloseHandler();
+    viewModalClose();
   }
 
   return (
-    <Container>
-      <Stack spacing={6} pt={6}>
-        <Heading as="h2">Books</Heading>
+    <PageLayout>
+      <Heading as="h2">Books</Heading>
 
-        <Box>
-          <BooksOptions
-            sort={sortStatus}
-            setSort={setSortStatus}
-            filter={filterStatus}
-            setFilter={setFilterStatus}
-          />
-        </Box>
-
-
-        <Stack spacing={2}>
-          {filteredBookList.map(book => (
-            <BookListEntry
-              book={book}
-              onClick={handleBookClick(book)}
-              key={book.id}
-            />
-          ))}
-        </Stack>
-
-        <AddBookButton onClick={() => setShowAddModal(true)} />
-
-        <AddBookModal
-          shown={showAddModal}
-          onClose={() => setShowAddModal(false)}
-          addBook={addBookHandler}
-          authors={authors}
+      <Box>
+        <BooksOptions
+          sort={sortStatus}
+          setSort={setSortStatus}
+          filter={filterStatus}
+          setFilter={setFilterStatus}
         />
+      </Box>
 
-        {selectedBook && <ViewBookModal
-          shown={showViewModal}
-          onClose={modalCloseHandler}
-          book={selectedBook}
-          editBook={() => alert('Can\'t edit yet')}
-          deleteSuccess={handleDeleteSuccess}
-          deleteFailed={handleDeleteFailed}
-        />}
+      <Stack>
+        {filteredBookList.map(book => (
+          <BookListEntry
+            book={book}
+            onClick={bookClick(book)}
+            key={book.id}
+          />
+        ))}
       </Stack>
 
+      <AddButton onClick={() => setShowAddModal(true)}>
+        <Text>Add book</Text>
+      </AddButton>
 
-    </Container>
+      <AddBookModal
+        shown={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        addBook={addBookHandler}
+        authors={authors}
+      />
+
+      {selectedBook && <ViewBookModal
+        shown={showViewModal}
+        onClose={viewModalClose}
+        book={selectedBook}
+        editBook={() => alert("Can't edit yet")}
+        handleDelete={handleDelete}
+      />}
+    </PageLayout>
   )
 };
 
