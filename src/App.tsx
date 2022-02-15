@@ -7,6 +7,7 @@ import Home from './home/Home';
 import Clients from './clients/Clients';
 import { auth } from './firebase/utils';
 import Header from './header/Header';
+import Loans from './loans/Loans';
 
 const App = () => {
   const [loggedIn, setLoggedIn] = useState(auth.currentUser !== null);
@@ -20,20 +21,33 @@ const App = () => {
     }
   })
 
+  const header = <Header showLinks={loggedIn}/>
+
+  if (!loggedIn) {
+    return (
+      <>
+        {header}
+        <Entry logIn={() => setLoggedIn(true)}/>
+      </>
+    )
+  }
+
   return(
     <>
-      <Header showLinks={loggedIn}/>
+      {header}
 
-      {!loggedIn
-        ? <Entry logIn={() => setLoggedIn(true)}/>
-        : (
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/books" element={<Books />}/>
-            <Route path="/clients" element={<Clients />}/>
-          </Routes>
-        )
-      }
+      <Routes>
+        <Route path="/" element={<Home />} />
+
+        <Route path="/books" element={<Books />} />
+        <Route path="/books/:bookId" element={<Books />} />
+
+        <Route path="/clients" element={<Clients />}/>
+        <Route path="/clients/:clientId" element={<Clients />}/>
+
+        <Route path="/loans" element={<Loans />}/>
+        <Route path="/loans/:loanId" element={<Loans />}/>
+      </Routes>
     </>
 
   );

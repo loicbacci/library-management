@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { addBook, getBookList, removeBook } from '../firebase/books';
+import { addBook, editBook, getBookList, removeBook } from '../firebase/books';
 import AddBookModal from './AddBookModal';
 import BookListEntry from './BookListEntry';
 import ViewBookModal from './ViewBookModal';
@@ -8,14 +8,19 @@ import { Box, Heading, Stack, Text, useToast } from '@chakra-ui/react';
 import BooksOptions from './BooksOptions';
 import PageLayout from '../common/PageLayout';
 import AddButton from '../common/AddButton';
-
+import { useNavigate, useParams } from 'react-router-dom';
 
 const Books = () => {
+  // React Router hooks
+  const params = useParams();
+  const navigate = useNavigate();
+
   // Toast
   const toast = useToast();
 
   // Books
   const [bookList, setBookList] = useState([] as Book[]);
+  const [initialized, setInitialized] = useState(false);
   const [sortedList, setSortedList] = useState([] as Book[]);
   const [filteredBookList, setFilteredBookList] = useState([] as Book[]);
 
@@ -34,8 +39,30 @@ const Books = () => {
 
   // Set listener for book list updates
   useEffect(() => {
-    getBookList(bs => setBookList(bs));
+    getBookList(bs => {
+      setBookList(bs);
+      setInitialized(true);
+    });
   }, []);
+
+  // Selected book handler
+  useEffect(() => {
+    if (params.bookId) {
+      const book = bookList.find(b => b.id === params.bookId)
+      if (book) {
+        setSelectedBook(book);
+        setShowViewModal(true);
+      } else if (initialized) {
+        toast({
+          title: "Failed to find book",
+          status: "error",
+          isClosable: true
+        })
+
+        navigate("/books");
+      }
+    }
+  }, [params, bookList, navigate, initialized, toast]);
 
 
   const addBookHandler = (title: string, author: string) => {
@@ -61,6 +88,7 @@ const Books = () => {
   const viewModalClose = () => {
     setShowViewModal(false);
     setSelectedBook(null);
+    navigate("/books");
   }
 
   // Filter books
@@ -72,10 +100,10 @@ const Books = () => {
         newBookList = Array.from(sortedList);
         break;
       case FilterStatus.Available:
-        newBookList = sortedList.filter(book => !book.loaned)
+        newBookList = sortedList.filter(book => !book.loanId)
         break;
       case FilterStatus.Loaned:
-        newBookList = sortedList.filter(book => book.loaned)
+        newBookList = sortedList.filter(book => book.loanId)
         break;
     }
 
@@ -105,8 +133,7 @@ const Books = () => {
 
   // Handlers
   const bookClick = (book: Book) => () => {
-    setSelectedBook(book);
-    setShowViewModal(true);
+    navigate(`/books/${book.id}`);
   }
 
   const handleDelete = () => {
@@ -123,6 +150,27 @@ const Books = () => {
       .catch((reason) => {
         toast({
           title: "Delete failed",
+          description: reason,
+          status: "error",
+          isClosable: true
+        })
+      })
+
+    viewModalClose();
+  }
+
+  const handleEdit = (newBook: Book) => {
+    editBook(newBook)
+      .then(() => {
+        toast({
+          title: "Edit successful",
+          status: "success",
+          isClosable: true
+        })
+      })
+      .catch((reason) => {
+        toast({
+          title: "Edit failed",
           description: reason,
           status: "error",
           isClosable: true
@@ -170,7 +218,7 @@ const Books = () => {
         shown={showViewModal}
         onClose={viewModalClose}
         book={selectedBook}
-        editBook={() => alert("Can't edit yet")}
+        editBook={handleEdit}
         handleDelete={handleDelete}
       />}
     </PageLayout>

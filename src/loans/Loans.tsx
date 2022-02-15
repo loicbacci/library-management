@@ -2,63 +2,61 @@ import React, { useEffect, useState } from 'react';
 import { Heading, Stack, Text, useToast } from '@chakra-ui/react';
 import PageLayout from '../common/PageLayout';
 import AddButton from '../common/AddButton';
-import { addClient, editClient, getClientsList, removeClient } from '../firebase/clients';
-import ClientsListEntry from './ClientsListEntry';
-import AddClientModal from './AddClientModal';
-import ViewClientModal from './ViewClientModal';
+import { addLoan, editLoan, getCurrentLoans, removeLoan } from '../firebase/loans';
+import LoansListEntry from './LoansListEntry';
+import AddLoanModal from './AddLoanModal';
+import ViewLoanModal from './ViewLoanModal';
 import { useNavigate, useParams } from 'react-router-dom';
 
 
-const Clients = () => {
+const Loans = () => {
   // React Router hooks
   const params = useParams();
   const navigate = useNavigate();
 
-  //TODO filter clients that have loaned books
-
   // Toast
   const toast = useToast();
 
-  // Clients
-  const [clients, setClients] = useState([] as Client[]);
+  // Loans
+  const [loans, setLoans] = useState([] as Loan[]);
   const [initialized, setInitialized] = useState(false);
 
   // Modals
   const [showAddModal, setShowAddModal] = useState(false);
 
   const [showViewModal, setShowViewModal] = useState(false);
-  const [selectedClient, setSelectedClient] = useState(null as Client | null);
+  const [selectedLoan, setSelectedLoan] = useState(null as Loan | null);
 
-  // Selected book handler
+  // Selected loan handler
   useEffect(() => {
-    if (params.clientId) {
-      const client = clients.find(c => c.id === params.clientId)
-      if (client) {
-        setSelectedClient(client);
+    if (params.loanId) {
+      const loan = loans.find(c => c.id === params.loanId)
+      if (loan) {
+        setSelectedLoan(loan);
         setShowViewModal(true);
       } else if (initialized) {
         toast({
-          title: "Failed to find client",
+          title: "Failed to find loan",
           status: "error",
           isClosable: true
         });
-        navigate("/clients");
+        navigate("/loans");
       }
     }
-  }, [params, clients, navigate, initialized, toast]);
+  }, [params, loans, navigate, initialized, toast]);
 
   // Set listener for client list updates
   useEffect(() => {
-    getClientsList(clients => {
-      setClients(clients);
+    getCurrentLoans(loans => {
+      setLoans(loans);
       setInitialized(true);
     });
   }, []);
 
 
-  const addClientHandler = (name: string, email: string, phone: string, address: string) => {
+  const addLoanHandler = (bookId: string, clientId: string, date: Date) => {
     setShowAddModal(false);
-    addClient(name, email, phone, address)
+    addLoan(bookId, clientId, date)
       .then(() => {
         toast({
           title: "Successfully added client",
@@ -78,20 +76,20 @@ const Clients = () => {
 
   const viewModalClose = () => {
     setShowViewModal(false);
-    setSelectedClient(null);
-    navigate("/clients");
+    setSelectedLoan(null);
+    navigate("/loans");
   }
 
 
   // Handlers
-  const clientClick = (client: Client) => () => {
-    navigate(`/clients/${client.id}`);
+  const loanClick = (loan: Loan) => () => {
+    navigate(`/loans/${loan.id}`);
   }
 
   const handleDelete = () => {
-    if (!selectedClient) return;
+    if (!selectedLoan) return;
 
-    removeClient(selectedClient.id)
+    removeLoan(selectedLoan.id)
       .then(() => {
         toast({
           title: "Delete successful",
@@ -111,8 +109,8 @@ const Clients = () => {
     viewModalClose();
   }
 
-  const handleEdit = (newClient: Client) => {
-    editClient(newClient)
+  const handleEdit = (newLoan: Loan) => {
+    editLoan(newLoan)
       .then(() => {
         toast({
           title: "Edit successful",
@@ -134,37 +132,37 @@ const Clients = () => {
 
   return (
     <PageLayout>
-      <Heading as="h2">Clients</Heading>
+      <Heading as="h2">Loans</Heading>
 
       <Stack>
-        {clients.map(client => (
-          <ClientsListEntry
-            client={client}
-            onClick={clientClick(client)}
-            key={client.id}
+        {loans.map(loan => (
+          <LoansListEntry
+            loan={loan}
+            onClick={loanClick(loan)}
+            key={loan.id}
           />
         ))}
       </Stack>
 
       <AddButton onClick={() => setShowAddModal(true)}>
-        <Text>Add client</Text>
+        <Text>Add loan</Text>
       </AddButton>
 
-      <AddClientModal
+      <AddLoanModal
         shown={showAddModal}
         onClose={() => setShowAddModal(false)}
-        addClient={addClientHandler}
+        addLoan={addLoanHandler}
       />
 
-      {selectedClient && <ViewClientModal
+      {selectedLoan && <ViewLoanModal
         shown={showViewModal}
         onClose={viewModalClose}
-        client={selectedClient}
-        editClient={handleEdit}
+        loan={selectedLoan}
+        editLoan={handleEdit}
         handleDelete={handleDelete}
       />}
     </PageLayout>
   )
 };
 
-export default Clients;
+export default Loans;

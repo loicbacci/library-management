@@ -21,6 +21,7 @@ const MenuLinks = (props: MenuLinksProps) => {
     >
       <MenuItem to="/books">Books</MenuItem>
       <MenuItem to="/clients">Clients</MenuItem>
+      <MenuItem to="/loans">Loans</MenuItem>
 
       <Spacer/>
       <Button

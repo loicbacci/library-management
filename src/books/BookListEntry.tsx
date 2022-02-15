@@ -11,7 +11,7 @@ const BookListEntry = (props: BookListEntryProps) => {
   const { book, onClick } = props;
   const { title, author } = book;
 
-  const bgColor = book.loaned ? "orange.200" : "transparent";
+  const bgColor = book.loanId ? "orange.200" : "transparent";
 
   return (
     <ListEntry onClick={onClick} bgColor={bgColor}>

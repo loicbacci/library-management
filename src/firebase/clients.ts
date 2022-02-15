@@ -1,4 +1,14 @@
-import { collection, doc, deleteDoc, onSnapshot, query, orderBy, FirestoreDataConverter, addDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  deleteDoc,
+  onSnapshot,
+  query,
+  orderBy,
+  FirestoreDataConverter,
+  addDoc,
+  updateDoc, getDoc
+} from 'firebase/firestore';
 import { db } from './utils';
 
 const clientConverter: FirestoreDataConverter<Client> = {
@@ -33,6 +43,11 @@ export const getClientsList = (onUpdate: (clients: Client[]) => void) => {
   });
 }
 
+export const getName = (id: string) => {
+  return getDoc(doc(clientsRef, id))
+    .then(clientSnap => clientSnap.exists() ? clientSnap.data().name : "")
+}
+
 export const removeClient = (id: string) => {
   return deleteDoc(doc(clientsRef, id));
 }
@@ -43,4 +58,10 @@ export const addClient = (name: string, email: string, phone: string, address: s
     id: ""
   }
   return addDoc(clientsRef, client)
+}
+
+export const editClient = (newClient: Client) => {
+  const { id, ...data } = newClient;
+
+  return updateDoc(doc(clientsRef, newClient.id), data);
 }

@@ -13,6 +13,10 @@ const Home = () => {
         <Button>
           <Link to="/clients">Clients</Link>
         </Button>
+
+        <Button>
+          <Link to="/loans">Loans</Link>
+        </Button>
       </Stack>
     </Center>
   );

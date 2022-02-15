@@ -1,27 +1,21 @@
-import { collection, doc, deleteDoc, onSnapshot, query, orderBy, FirestoreDataConverter, addDoc } from "firebase/firestore";
+import { getDoc, collection, doc, deleteDoc, onSnapshot, query, orderBy, FirestoreDataConverter, addDoc, updateDoc } from "firebase/firestore";
 import { db } from './utils';
 
 const bookConverter: FirestoreDataConverter<Book> = {
   toFirestore: (book) => {
-    return {
-      title: book.title,
-      author: book.author,
-    }
+    const { id, ...newBook } = book;
+
+    return newBook;
   },
+
   fromFirestore: (snapshot, options) => {
     const data = snapshot.data(options);
 
     const book: Book = {
       title: data.title,
       author: data.author,
-      loaned: data.loaned,
+      loanId: data.loanId,
       id: snapshot.id
-    }
-
-    if (data.loaned) {
-      const path = data.loan._key.path;
-      const segments = path.segments.slice(path.offset + 1);
-      book.loanId = segments[0];
     }
 
     return book;
@@ -38,6 +32,11 @@ export const getBookList = (onUpdate: (books: Book[]) => void) => {
   });
 }
 
+export const getTitle = (id: string) => {
+  return getDoc(doc(booksRef, id))
+    .then(bookSnap => bookSnap.exists() ? bookSnap.data().title : "")
+}
+
 export const removeBook = (id: string) => {
   return deleteDoc(doc(booksRef, id));
 }
@@ -45,8 +44,14 @@ export const removeBook = (id: string) => {
 export const addBook = (title: string, author: string) => {
   const book: Book = {
     title, author,
-    loaned: false,
     id: ""
   }
+
   return addDoc(booksRef, book)
+}
+
+export const editBook = (newBook: Book) => {
+  const { id, ...data } = newBook;
+
+  return updateDoc(doc(booksRef, newBook.id), data);
 }

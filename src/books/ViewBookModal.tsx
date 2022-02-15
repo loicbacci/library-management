@@ -4,15 +4,15 @@ import {
   Button,
   ButtonGroup,
   FormControl,
-  FormLabel, Heading, IconButton,
+  FormLabel, Heading, HStack, IconButton,
   Input, Modal,
   ModalBody,
   ModalContent, ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Stack, Text
+  Stack, StackDivider, Text
 } from '@chakra-ui/react';
-import { FiTrash } from 'react-icons/fi';
+import { FiEdit, FiTrash } from 'react-icons/fi';
 
 interface ViewBookModalProps {
   shown: boolean,
@@ -30,11 +30,22 @@ const ViewBookModal = (props: ViewBookModalProps) => {
   const [title, setTitle] = useState(book.title);
   const [author, setAuthor] = useState(book.author);
 
+  const [editing, setEditing] = useState(false);
+
   const handleSubmit = () => {
     editBook({
       ...book,
       title, author
     })
+  }
+
+  const toggleEdit = () => {
+    if (editing) {
+      setTitle(book.title);
+      setAuthor(book.author);
+    }
+
+    setEditing(!editing);
   }
 
   return (
@@ -58,6 +69,7 @@ const ViewBookModal = (props: ViewBookModalProps) => {
                 placeholder="Enter title"
                 value={title}
                 onChange={e => setTitle(e.target.value)}
+                disabled={!editing}
               />
             </FormControl>
 
@@ -70,6 +82,7 @@ const ViewBookModal = (props: ViewBookModalProps) => {
                 placeholder="Enter author"
                 value={author}
                 onChange={e => setAuthor(e.target.value)}
+                disabled={!editing}
               />
             </FormControl>
 
@@ -78,14 +91,32 @@ const ViewBookModal = (props: ViewBookModalProps) => {
 
         <ModalFooter>
           <ButtonGroup>
-            <IconButton
-              colorScheme="red"
-              aria-label="Delete book"
-              icon={<FiTrash />}
-              onClick={handleDelete}
-            />
-            <Button onClick={onClose}>Cancel</Button>
-            <Button colorScheme="teal" onClick={handleSubmit}>Edit</Button>
+            <HStack divider={<StackDivider borderColor="gray.200" />} spacing={2}>
+              <IconButton
+                aria-label="Edit book"
+                onClick={toggleEdit}
+                icon={<FiEdit/>}
+                isActive={editing}
+              />
+
+              {editing
+                ? <>
+                  <HStack>
+                    <IconButton
+                      colorScheme="red"
+                      aria-label="Delete book"
+                      icon={<FiTrash />}
+                      onClick={handleDelete}
+                    />
+
+                    <Button colorScheme="teal" onClick={handleSubmit}>
+                      Edit
+                    </Button>
+                  </HStack>
+                </>
+                : <Button onClick={onClose}>Close</Button>
+              }
+            </HStack>
           </ButtonGroup>
 
         </ModalFooter>

@@ -136,16 +136,13 @@ const ViewClientModal = (props: ViewClientModalProps) => {
 
         <ModalFooter>
           <ButtonGroup>
-
             <HStack divider={<StackDivider borderColor="gray.200" />} spacing={2}>
-              {editing
-                ? <Button onClick={toggleEdit}>Cancel</Button>
-                : <IconButton
-                  aria-label="Edit client"
-                  onClick={toggleEdit}
-                  icon={<FiEdit/>}
-                />
-              }
+              <IconButton
+                aria-label="Edit client"
+                onClick={toggleEdit}
+                icon={<FiEdit/>}
+                isActive={editing}
+              />
 
               {editing
                 ? <>
