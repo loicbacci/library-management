@@ -1,41 +1,31 @@
 import React from 'react';
-import ListGroup from 'react-bootstrap/ListGroup';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleRight } from '@fortawesome/free-solid-svg-icons';
+import { Text, Wrap, WrapItem } from '@chakra-ui/react';
+import ListEntry from '../common/ListEntry';
 
 interface BookListEntryProps {
   book: Book
-
   onClick: () => void,
-  isActive: boolean,
-
-  noAuthor?: boolean
 }
 
 const BookListEntry = (props: BookListEntryProps) => {
-  const { book, onClick, isActive, noAuthor } = props;
+  const { book, onClick } = props;
   const { title, author } = book;
 
-  const variant = book.loaned ? "warning" : "";
+  const bgColor = book.loanId ? "orange.200" : "transparent";
 
   return (
-    <ListGroup.Item
-      className="d-flex justify-content-between align-items-start"
-      onClick={onClick}
-      action
-      active={isActive}
-      variant={variant}
-    >
-      <div className="ms-2 me-auto">
-        <span className={!noAuthor ? 'fw-bold' : ""}>{title}</span>
-        {!noAuthor && ` - ${author}`}
-      </div>
+    <ListEntry onClick={onClick} bgColor={bgColor}>
+      <Wrap>
+        <WrapItem>
+          <Text fontWeight="semibold">{title}</Text>
+        </WrapItem>
+        <WrapItem>
+          <Text> - {author}</Text>
+        </WrapItem>
+      </Wrap>
+    </ListEntry>
+  )
 
-      <div className="my-auto">
-        <FontAwesomeIcon icon={faAngleRight}/>
-      </div>
-    </ListGroup.Item>
-  );
 }
 
 export default BookListEntry;

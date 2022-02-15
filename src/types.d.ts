@@ -1,7 +1,6 @@
 interface Book {
   author: string,
   title: string,
-  loaned: boolean,
 
   id: string,
 
@@ -17,8 +16,11 @@ interface Client {
   id: string,
 }
 
-interface Field {
-  displayName: string,
-  fieldName: string,
-  placeholder?: string
+interface Loan {
+  bookId: string,
+  clientId: string,
+  date: Date,
+  returned: boolean,
+
+  id: string
 }

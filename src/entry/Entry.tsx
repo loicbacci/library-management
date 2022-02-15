@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase/utils';
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
-import Card from 'react-bootstrap/Card';
-import Container from 'react-bootstrap/Container';
+import { Box, Button, Center, Container, Heading, Stack } from '@chakra-ui/react';
+import EmailInput from './EmailInput';
+import PasswordInput from './PasswordInput';
 
 interface EntryProps {
   logIn: () => void
@@ -13,6 +12,7 @@ interface EntryProps {
 const Entry = ({ logIn }: EntryProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
@@ -30,33 +30,35 @@ const Entry = ({ logIn }: EntryProps) => {
   }, [logIn]);
 
   return (
-    <Container className="mt-3">
-      <h1>Library Management</h1>
+    <Container>
+      <Center>
+        <Box
+          borderWidth='1px'
+          borderRadius='lg'
+          p={6}
+          mt={4}
+        >
+          <Stack spacing={4}>
+            <Heading>Sign in</Heading>
 
-      <Card>
-        <Card.Body>
-          <Card.Title>Sign in</Card.Title>
+            <form onSubmit={handleSubmit}>
+              <Stack spacing={4}>
+                <EmailInput email={email} setEmail={setEmail} />
 
-          <Form onSubmit={handleSubmit}>
-            <Form.Group className="mb-3" controlId="formEmail">
-              <Form.Label>Email</Form.Label>
-              <Form.Control type="email" placeholder="Enter email"
-                            onChange={e => setEmail(e.target.value)}/>
-            </Form.Group>
+                <PasswordInput
+                  password={password}
+                  setPassword={setPassword}
+                />
 
-            <Form.Group className="mb-3" controlId="formPassword">
-              <Form.Label>Password</Form.Label>
-              <Form.Control type="password" placeholder="Password"
-                            onChange={e => setPassword(e.target.value)}/>
-            </Form.Group>
+                <Button type="submit" colorScheme="teal" variant="outline" size="md">
+                  Submit
+                </Button>
+              </Stack>
 
-            <Button variant="primary" type="submit">
-              Submit
-            </Button>
-          </Form>
-        </Card.Body>
-      </Card>
-
+            </form>
+          </Stack>
+        </Box>
+      </Center>
     </Container>
   );
 }

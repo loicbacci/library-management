@@ -1,10 +1,18 @@
 import React, { useState } from 'react';
-import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
 import { removeBook } from '../firebase/books';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import {
+  Button,
+  ButtonGroup,
+  FormControl,
+  FormLabel, Heading, HStack, IconButton,
+  Input, Modal,
+  ModalBody,
+  ModalContent, ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Stack, StackDivider, Text
+} from '@chakra-ui/react';
+import { FiEdit, FiTrash } from 'react-icons/fi';
 
 interface ViewBookModalProps {
   shown: boolean,
@@ -13,15 +21,16 @@ interface ViewBookModalProps {
 
   editBook: (newBook: Book) => void,
 
-  deleteSuccess: () => void,
-  deleteFailed: (reason: any) => void,
+  handleDelete: () => void
 }
 
 const ViewBookModal = (props: ViewBookModalProps) => {
-  const { shown, onClose, book, editBook, deleteSuccess, deleteFailed } = props;
+  const { shown, onClose, book, editBook, handleDelete } = props;
 
   const [title, setTitle] = useState(book.title);
   const [author, setAuthor] = useState(book.author);
+
+  const [editing, setEditing] = useState(false);
 
   const handleSubmit = () => {
     editBook({
@@ -30,65 +39,88 @@ const ViewBookModal = (props: ViewBookModalProps) => {
     })
   }
 
-  const handleDelete = () => {
-    removeBook(book.id)
-      .then(deleteSuccess)
-      .catch(deleteFailed)
+  const toggleEdit = () => {
+    if (editing) {
+      setTitle(book.title);
+      setAuthor(book.author);
+    }
+
+    setEditing(!editing);
   }
 
   return (
-    <Modal show={shown} centered>
-      <Modal.Header>
-        <Modal.Title>{book.title}</Modal.Title>
-        {book.author}
-      </Modal.Header>
+    <Modal isOpen={shown} onClose={onClose} closeOnOverlayClick={false}>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>
+          <Heading>{title}</Heading>
+          <Text>{author}</Text>
+        </ModalHeader>
 
-      <Modal.Body>
+        <ModalBody>
+          <Stack spacing={4}>
 
-        <Form>
-          <Form.Group className="mb-3" controlId="formTitle">
-            <Form.Label>Title</Form.Label>
-            <Form.Control type="text" value={book.title}
-                          onChange={e => setTitle(e.target.value)}
-            />
-          </Form.Group>
-
-          <Form.Group className="mb-3" controlId="formAuthor">
-            <Form.Label>Author</Form.Label>
-            <Form.Control type="text" value={book.author}
-                          onChange={e => setAuthor(e.target.value)}
-            />
-          </Form.Group>
-
-          <Form.Check
-            type="checkbox"
-            label="Loaned?"
-            checked={book.loaned}
-            disabled
-          />
-
-          {book.loaned && (
-            <Form.Group className="mb-3" controlId="formLoanId">
-              <Form.Label>Loan ID</Form.Label>
-              <Form.Control type="text" value={book.loanId}
-                            disabled
+            <FormControl>
+              <FormLabel htmlFor="title">Title</FormLabel>
+              <Input
+                id="title"
+                pr="4.5rem"
+                type="text"
+                placeholder="Enter title"
+                value={title}
+                onChange={e => setTitle(e.target.value)}
+                disabled={!editing}
               />
-            </Form.Group>
-          )}
-        </Form>
-      </Modal.Body>
+            </FormControl>
 
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onClose}>
-          Close
-        </Button>
-        <Button variant="primary" onClick={handleSubmit}>
-          Edit
-        </Button>
-        <Button variant="danger" onClick={handleDelete}>
-          <FontAwesomeIcon icon={faTrash} />
-        </Button>
-      </Modal.Footer>
+            <FormControl>
+              <FormLabel htmlFor="author">Author</FormLabel>
+              <Input
+                id="author"
+                pr="4.5rem"
+                type="text"
+                placeholder="Enter author"
+                value={author}
+                onChange={e => setAuthor(e.target.value)}
+                disabled={!editing}
+              />
+            </FormControl>
+
+          </Stack>
+        </ModalBody>
+
+        <ModalFooter>
+          <ButtonGroup>
+            <HStack divider={<StackDivider borderColor="gray.200" />} spacing={2}>
+              <IconButton
+                aria-label="Edit book"
+                onClick={toggleEdit}
+                icon={<FiEdit/>}
+                isActive={editing}
+              />
+
+              {editing
+                ? <>
+                  <HStack>
+                    <IconButton
+                      colorScheme="red"
+                      aria-label="Delete book"
+                      icon={<FiTrash />}
+                      onClick={handleDelete}
+                    />
+
+                    <Button colorScheme="teal" onClick={handleSubmit}>
+                      Edit
+                    </Button>
+                  </HStack>
+                </>
+                : <Button onClick={onClose}>Close</Button>
+              }
+            </HStack>
+          </ButtonGroup>
+
+        </ModalFooter>
+      </ModalContent>
     </Modal>
   );
 }

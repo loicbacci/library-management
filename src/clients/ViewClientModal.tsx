@@ -3,59 +3,67 @@ import {
   Button,
   ButtonGroup,
   FormControl,
-  FormLabel,
-  Input,
-  InputGroup, InputLeftElement,
-  Modal,
+  FormLabel, Heading, HStack, IconButton,
+  Input, InputGroup, InputLeftElement, Modal,
   ModalBody,
-  ModalContent,
-  ModalFooter,
+  ModalContent, ModalFooter,
   ModalHeader,
-  ModalOverlay,
-  Stack
+  ModalOverlay, Spacer,
+  Stack, StackDivider, Text
 } from '@chakra-ui/react';
-import { FiHome, FiMail, FiPhone, FiUser } from 'react-icons/fi';
+import { FiEdit, FiHome, FiMail, FiPhone, FiTrash, FiUser } from 'react-icons/fi';
 
-interface AddClientModalProps {
+interface ViewClientModalProps {
   shown: boolean,
   onClose: () => void,
-  addClient: (name: string, email: string, phone: string, address: string) => void,
+  client: Client,
+
+  editClient: (newClient: Client) => void,
+
+  handleDelete: () => void
 }
 
-const AddClientModal = (props: AddClientModalProps) => {
-  const { shown, onClose, addClient } = props;
+const ViewClientModal = (props: ViewClientModalProps) => {
+  const { shown, onClose, client, editClient, handleDelete } = props;
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
+  const [name, setName] = useState(client.name);
+  const [email, setEmail] = useState(client.email);
+  const [phone, setPhone] = useState(client.phone);
+  const [address, setAddress] = useState(client.address);
 
-  const resetFields = () => {
-    setName("");
-    setEmail("");
-    setPhone("");
-    setAddress("");
-  }
+  const [editing, setEditing] = useState(false);
 
   const handleSubmit = () => {
-    addClient(name, email, phone, address);
-    resetFields();
+    editClient({
+      ...client,
+      name, email, phone, address
+    })
   }
 
-  const handleClose = () => {
-    onClose();
-    resetFields();
+  const toggleEdit = () => {
+    if (editing) {
+      setName(client.name);
+      setEmail(client.email);
+      setPhone(client.phone);
+      setAddress(client.address);
+    }
+
+    setEditing(!editing);
   }
 
   return (
-    <Modal isOpen={shown} onClose={handleClose} closeOnOverlayClick={false}>
+    <Modal isOpen={shown} onClose={onClose} closeOnOverlayClick={false}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Add a client</ModalHeader>
+        <ModalHeader>
+          <HStack>
+            <Heading>{client.name}</Heading>
+          </HStack>
+
+        </ModalHeader>
 
         <ModalBody>
           <Stack spacing={4}>
-
             <FormControl>
               <InputGroup>
                 <InputLeftElement pointerEvents="none">
@@ -68,6 +76,7 @@ const AddClientModal = (props: AddClientModalProps) => {
                   value={name}
                   onChange={e => setName(e.target.value)}
                   autoComplete="name"
+                  disabled={!editing}
                 />
               </InputGroup>
             </FormControl>
@@ -84,6 +93,7 @@ const AddClientModal = (props: AddClientModalProps) => {
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   autoComplete="email"
+                  disabled={!editing}
                 />
               </InputGroup>
             </FormControl>
@@ -100,6 +110,7 @@ const AddClientModal = (props: AddClientModalProps) => {
                   value={phone}
                   onChange={e => setPhone(e.target.value)}
                   autoComplete="tel"
+                  disabled={!editing}
                 />
               </InputGroup>
             </FormControl>
@@ -116,24 +127,47 @@ const AddClientModal = (props: AddClientModalProps) => {
                   value={address}
                   onChange={e => setAddress(e.target.value)}
                   autoComplete="street-address"
+                  disabled={!editing}
                 />
               </InputGroup>
             </FormControl>
-
           </Stack>
         </ModalBody>
 
         <ModalFooter>
           <ButtonGroup>
+            <HStack divider={<StackDivider borderColor="gray.200" />} spacing={2}>
+              <IconButton
+                aria-label="Edit client"
+                onClick={toggleEdit}
+                icon={<FiEdit/>}
+                isActive={editing}
+              />
 
-            <Button onClick={handleClose}>Cancel</Button>
-            <Button colorScheme="teal" onClick={handleSubmit}>Save</Button>
+              {editing
+                ? <>
+                  <HStack>
+                    <IconButton
+                      colorScheme="red"
+                      aria-label="Delete client"
+                      icon={<FiTrash />}
+                      onClick={handleDelete}
+                    />
+
+                    <Button colorScheme="teal" onClick={handleSubmit}>
+                      Edit
+                    </Button>
+                  </HStack>
+                </>
+                : <Button onClick={onClose}>Close</Button>
+              }
+            </HStack>
           </ButtonGroup>
 
         </ModalFooter>
       </ModalContent>
     </Modal>
-  )
+  );
 }
 
-export default AddClientModal;
+export default ViewClientModal;
